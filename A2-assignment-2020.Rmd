@@ -1,0 +1,142 @@
+---
+title: "Assignment 2"
+author: "Student Name, SID"
+output:
+  html_document: default
+  html_notebook: default
+---
+
+# Instructions
+
+1. Change the "author" listing in the YAML header to reflect your name and SFU id.
+2. Answer the questions below: do not modify the "Questions" part, but enter your answer under the "Answer" heading.
+3. Submit this ``.Rmd`` and ``.html`` file on Canvas.
+
+If you need more clarification on the questions below, please find their location in the book. *Note that the code chunks below in the quesetions have an option turned on `eval=FALSE`, this means the code will not be evaluated. Make sure to remove this option for code in your answers so that it runs*
+
+
+# Assignment 
+
+
+## Question 1
+
+### Question
+
+Install the tidyverse package and load the library. 
+
+Download the "cancensus_income_educ.csv" file from Canvas and read in using the `read.csv()` function in R creating a dataset in R called "income". Note that this data was extracted from the `cancensus` package in R and includes data where each observation is a Census Metropolitan Area (CMA) in Canada (think fo these areas as cities). The data captures information from the 2016 census including the median household income (`hh_med_income`) and total number of indivudals in the CMA with a university degree (bachelors or above). 
+
+Use the R funtion to describe the structure of the data and comment on how many observations there are.  
+
+### Answer
+install.packages("tidyverse")
+library(tidyverse)
+income<-read.csv(file='C:/Users/Muhammad Ahmad/Downloads/cacensus_income_educ.csv')
+typeof(income)
+length(income)
+str(income)
+nrow(income)
+#there are 49 observations and 12 variables
+## Question 2
+
+### Question
+
+What happens if you make a scatterplot of `province` versus `hh_med_income`? Why is the plot not useful?.
+
+### Answer
+It gives us a visual of how household income varries across provinces
+
+## Question 3
+
+### Question
+
+Now using the `income` data, create a scatter point plot with Population on the horizontal (x) axis and median houshoeld income on the vertical (y) axis and use the `shape` aesthetic to try to assign a different shape for each province. Describe the issues associated with your plot. 
+
+### Answer
+ ggplot(data = income) +
+geom_point(mapping = aes(x =Population , y = hh_med_income, shape=province))
+##the graph doesn'y assign any shape to 4 provinces,hence they aren't visible on graph.(We could use color rather shape)
+
+
+## Question 4
+
+### Question
+
+Use the code below to create a new column in `income` (a new variable) representing the percentage of the CMA population that has a university degree (`pct_univ_educ`) and a new variable that is the natural log of household median income (`ln_hh_med_income`)
+
+```{r, eval=FALSE}
+income$pct_univ_educ= income$univ_educ/income$Population
+income$ln_hh_med_income= log(income$hh_med_income)
+```
+
+Create a scatter point plot with `ln_hh_med_income` on the vertical axis and `pct_univ_educ` on the horizontal axis. Comment on the apparent relationship between income and education. 
+
+ 
+
+### Answer
+ggplot(data=income)+
+geom_point(mapping=aes(x=pct_univ_educ, y=ln_hh_med_income))
+##it appears that median income has positive relationship with percentage of people with university education, log of household median income appears to increase with increase in percentage of people with university education.   
+
+## Question 5
+
+
+### Question
+ First, use the code below to filter the data to only include the larger provinces and reproduce the plot from the previous question for this subsample.  
+
+```{r, eval=FALSE}
+  ggplot(data = filter(income,province=="Quebec" | province=="Ontario" | province=="Alberta" | province=="British Columbia")) + 
+      geom_point(mapping = aes(x = pct_univ_educ, y = ln_hh_med_income))
+      
+```
+
+
+Then modify this plot for just these four provinces using `geom_smooth` to overlay a separate smooth line for each province that is a different color. Use the option `se=FALSE` within `geom_smooth` to suppress the shaded confidence intervals. Comment on the similarities or differences in the relationship between education and income for different provinces and territories. 
+
+### Answer
+ggplot( data=income, mapping = aes (x = pct_univ_educ, y = ln_hh_med_income, color = province )) +
+geom_smooth( mapping = aes( linetype = province))
+
+ggplot(data = filter(income,province=="Quebec" | province=="Ontario" | province=="Alberta" | province=="British Columbia"), mapping = aes (x = pct_univ_educ, y = ln_hh_med_income, color = province )) + 
+geom_smooth( mapping = aes(linetype=province), se = FALSE)
+
+##Ontario and Quebec have similar trend and median wage tend to increase with percentage of people with university education. BC doesn't seem to have general trend. AB seems to extreme jumps in log of median income with changes in  percentage of people with university education, however not in any general direction. 
+
+## Question 6
+
+### Question
+
+There are many options for ggplot functions. The `geom_smooth` function has an option on the method (or model) used to draw the line. Add the `method="lm"` option to your `geom_smooth` function to draw straight lines and comment on whether the relationship between higher education percentage and household income looks more similar across the four provinces. 
+
+
+### Answer 
+ggplot(data = filter(income,province=="Quebec" | province=="Ontario" | province=="Alberta" | province=="British Columbia"), mapping = aes (x = pct_univ_educ, y = ln_hh_med_income, color = province )) + 
+geom_smooth( method=lm, mapping = aes(linetype=province), se = FALSE)
+## AB, ON and QC appears to have similar posoitive relationship. BC seems to have very weak positive relationship.
+
+## Question 7
+
+### Question 
+
+What statistical transformation function can you use to create a bar chart with the number of CMAs per province in the `income` dataset. Demonstrate the plot using this function and compare to a plot using `geom_bar`. Also, use a ggplot function to flip the coordinates so that it is easier to read the province names.
+
+
+### Answer
+ggplot(data = income) +
+stat_count(mapping = aes(x = province))+
+coord_flip()
+
+ggplot(data = income) +
+geom_bar(mapping = aes(x =province ))
+coord_flip()
+
+## Question 8
+
+### Question
+
+Explore the CMA income data set further. Use aesthetic options or geom functions that we have not not used above AND variables not used above to plot something that you find interesting. Use other variables we haven't focused on or transform variables in ways that you think would be interesting. Write a brief paragraph explaining what you did and what you found that was intersting. What does your visualization help us better understand? PLEASE NOTE THAT EVERYONE SHOULD HAVE A DIFFERENT ANSWER FOR THIS QUESTION. 
+
+### Answer
+ggplot(data = filter(income,province=="Quebec" | province=="Ontario" | province=="Alberta" | province=="British Columbia"), mapping = aes (x = province, y = hh_med_income, color=province)) +
+geom_boxplot()
+##I just plotted a boxplot to see how median of median household income varries across large provinces in Canada, as well as compare upper and lower quartiles of income across these provinces. Alberta has the highest median (median household) income followed by BC then On and then QC. Alberta's lower quartile have higher median HH income than other provinces upper quartiles. Ontaria seems to have greater variation in HH income compared to BC, i.e its upper quartile is greater than BC and its lower quartile is smaller than BC. 
